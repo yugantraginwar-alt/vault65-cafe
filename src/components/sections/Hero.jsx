@@ -1,6 +1,7 @@
 import { Suspense, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, Preload } from '@react-three/drei';
+import { EffectComposer, Bloom, Noise } from '@react-three/postprocessing';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import HeroScene from '../3d/HeroScene';
 
@@ -46,6 +47,10 @@ export default function Hero() {
           <Suspense fallback={null}>
             <HeroScene />
             <Environment preset="city" />
+            <EffectComposer disableNormalPass multisampling={4}>
+              <Bloom luminanceThreshold={0.6} mipmapBlur intensity={1.2} />
+              <Noise opacity={0.04} />
+            </EffectComposer>
             <Preload all />
           </Suspense>
         </Canvas>
@@ -64,9 +69,26 @@ export default function Hero() {
           <h1 className="text-5xl md:text-8xl font-serif text-white tracking-wider mb-4 drop-shadow-2xl">
             VAULT<span className="text-primary text-glow">65</span>
           </h1>
-          <p className="text-lg md:text-2xl text-white/80 font-light tracking-widest uppercase mb-10 max-w-2xl mx-auto">
-            Where Coffee Meets Atmosphere
-          </p>
+          <motion.div 
+            className="text-lg md:text-2xl text-white/80 font-light tracking-widest uppercase mb-10 max-w-2xl mx-auto overflow-hidden flex justify-center"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              visible: { transition: { staggerChildren: 0.05, delayChildren: 2 } }
+            }}
+          >
+            {"Where Coffee Meets Atmosphere".split("").map((char, index) => (
+              <motion.span
+                key={index}
+                variants={{
+                  hidden: { opacity: 0, y: 10 },
+                  visible: { opacity: 1, y: 0 }
+                }}
+              >
+                {char === " " ? "\u00A0" : char}
+              </motion.span>
+            ))}
+          </motion.div>
         </motion.div>
 
         <motion.div 

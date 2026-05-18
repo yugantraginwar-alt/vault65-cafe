@@ -7,6 +7,7 @@ import Particles from './Particles';
 
 export default function HeroScene() {
   const group = useRef();
+  const lightRef = useRef();
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
@@ -14,10 +15,18 @@ export default function HeroScene() {
       group.current.rotation.y = Math.sin(t / 4) / 4;
       group.current.rotation.x = Math.cos(t / 4) / 8;
     }
+    if (lightRef.current) {
+      // Sweeping light effect
+      lightRef.current.position.x = Math.sin(t * 0.5) * 10;
+      lightRef.current.position.z = Math.cos(t * 0.5) * 10;
+    }
   });
 
   return (
     <>
+      <fogExp2 attach="fog" args={['#080808', 0.08]} />
+      <spotLight ref={lightRef} position={[0, 10, 0]} intensity={2} color="#D4AF37" angle={0.5} penumbra={1} castShadow />
+      
       <OrbitControls 
         enableZoom={false}
         enablePan={false}

@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Coffee } from 'lucide-react';
+import { useRef } from 'react';
 
 const menuItems = [
   { name: 'Espresso', price: '$4.50', desc: 'Rich, intense, and perfectly extracted.' },
@@ -26,6 +27,76 @@ const cardVariants = {
     transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] }
   }
 };
+
+// 3D Tilt Card Component
+function TiltCard({ item, index }) {
+  const ref = useRef(null);
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+  
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div 
+      ref={ref}
+      variants={cardVariants}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d"
+      }}
+      className="group relative p-8 glass rounded-2xl cursor-pointer transition-colors duration-500 overflow-hidden perspective-1000"
+    >
+      <div 
+        className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" 
+        style={{ transform: "translateZ(-10px)" }}
+      />
+      <div 
+        className="absolute -inset-0.5 bg-gradient-to-br from-primary to-transparent opacity-0 group-hover:opacity-30 blur-md transition-opacity duration-500" 
+      />
+      
+      <div className="relative z-10" style={{ transform: "translateZ(30px)" }}>
+        <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/20 group-hover:shadow-[0_0_15px_rgba(212,175,55,0.4)] transition-all duration-500">
+          <Coffee className="text-primary w-6 h-6" />
+        </div>
+        
+        <div className="flex justify-between items-baseline mb-4">
+          <h3 className="text-xl font-serif text-white group-hover:text-primary transition-colors">{item.name}</h3>
+          <span className="text-primary font-mono group-hover:scale-110 transition-transform">{item.price}</span>
+        </div>
+        
+        <p className="text-muted text-sm leading-relaxed">
+          {item.desc}
+        </p>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Menu() {
   return (
@@ -59,33 +130,10 @@ export default function Menu() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000"
         >
           {menuItems.map((item, index) => (
-            <motion.div 
-              key={index}
-              variants={cardVariants}
-              whileHover={{ y: -10 }}
-              className="group relative p-8 glass rounded-2xl cursor-pointer transition-all duration-500 overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute -inset-0.5 bg-gradient-to-br from-primary to-transparent opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-500" />
-              
-              <div className="relative z-10">
-                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors duration-500">
-                  <Coffee className="text-primary w-6 h-6" />
-                </div>
-                
-                <div className="flex justify-between items-baseline mb-4">
-                  <h3 className="text-xl font-serif text-white group-hover:text-primary transition-colors">{item.name}</h3>
-                  <span className="text-primary font-mono">{item.price}</span>
-                </div>
-                
-                <p className="text-muted text-sm leading-relaxed">
-                  {item.desc}
-                </p>
-              </div>
-            </motion.div>
+            <TiltCard key={index} item={item} index={index} />
           ))}
         </motion.div>
       </div>

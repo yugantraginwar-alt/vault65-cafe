@@ -35,14 +35,22 @@ export default function LoadingScreen() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
         >
           <div className="relative flex flex-col items-center">
-            {/* Logo Text */}
+            {/* Cinematic smoke/glow behind logo */}
+            <motion.div 
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[100px]"
+              animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            />
+            
+            {/* Logo Text with tracking animation */}
             <motion.h1 
-              className="text-4xl md:text-6xl font-serif text-white tracking-widest uppercase mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-4xl md:text-6xl font-serif text-white uppercase mb-8 relative z-10"
+              initial={{ opacity: 0, filter: "blur(10px)", tracking: "0em" }}
+              animate={{ opacity: 1, filter: "blur(0px)", tracking: "0.2em" }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              style={{ letterSpacing: "0.2em" }}
             >
-              Vault65
+              Vault<span className="text-primary">65</span>
             </motion.h1>
             
             {/* Progress Bar Container */}
