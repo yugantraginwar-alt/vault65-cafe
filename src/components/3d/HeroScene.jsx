@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Float, PresentationControls } from '@react-three/drei';
+import { Float, OrbitControls } from '@react-three/drei';
 import CoffeeCup from './CoffeeCup';
 import FloatingBeans from './FloatingBeans';
 import Particles from './Particles';
@@ -17,14 +17,21 @@ export default function HeroScene() {
   });
 
   return (
-    <PresentationControls
-      global
-      config={{ mass: 2, tension: 500 }}
-      snap={{ mass: 4, tension: 1500 }}
-      rotation={[0, 0.3, 0]}
-      polar={[-Math.PI / 3, Math.PI / 3]}
-      azimuth={[-Math.PI / 1.4, Math.PI / 2]}
-    >
+    <>
+      <OrbitControls 
+        enableZoom={false}
+        enablePan={false}
+        enableRotate={true}
+        enableDamping={true}
+        dampingFactor={0.05}
+        autoRotate={false}
+        maxPolarAngle={Math.PI / 2 + 0.3}
+        minPolarAngle={Math.PI / 2 - 0.5}
+        touches={{
+          ONE: 1, // touch rotate
+          TWO: 0  // disable touch zoom/pan
+        }}
+      />
       <group ref={group}>
         <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
           <CoffeeCup />
@@ -32,6 +39,6 @@ export default function HeroScene() {
         <FloatingBeans count={15} />
         <Particles count={300} />
       </group>
-    </PresentationControls>
+    </>
   );
 }

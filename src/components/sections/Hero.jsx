@@ -18,8 +18,26 @@ export default function Hero() {
   return (
     <section ref={containerRef} id="hero" className="relative w-full h-screen overflow-hidden bg-background">
       {/* 3D Canvas Background */}
-      <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 8], fov: 45 }} dpr={[1, 2]}>
+      <div className="absolute inset-0 z-0 three-container" draggable="false">
+        <Canvas 
+          camera={{ position: [0, 0, 8], fov: 45 }} 
+          dpr={[1, 1.5]} 
+          gl={{ 
+            preserveDrawingBuffer: false, 
+            powerPreference: "high-performance",
+            antialias: true 
+          }}
+          onCreated={({ gl }) => {
+            gl.domElement.addEventListener('webglcontextlost', (event) => {
+              event.preventDefault();
+              console.log('WebGL context lost - preventing default crash');
+            });
+            gl.domElement.addEventListener('webglcontextrestored', () => {
+              console.log('WebGL context restored - recovering');
+            });
+          }}
+          style={{ touchAction: 'none' }}
+        >
           <color attach="background" args={['#080808']} />
           <ambientLight intensity={0.2} />
           <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />

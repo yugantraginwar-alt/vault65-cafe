@@ -52,3 +52,14 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
+
+/* Fix mobile 3D interactions */
+canvas,
+.three-container,
+.model-wrapper {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+    -webkit-user-drag: none;
+}
